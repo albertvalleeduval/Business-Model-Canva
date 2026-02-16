@@ -272,7 +272,7 @@
           'HTTP-Referer': window.location.href
         },
         body: JSON.stringify({
-          model: 'meta-llama/llama-3-70b-instruct:free',
+          model: 'mistralai/mistral-small-3.1-24b-instruct:free',
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: 'Voici le texte du document :\n\n' + truncated }

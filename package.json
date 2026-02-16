@@ -1,0 +1,10 @@
+{
+  "name": "business-model-canvas",
+  "version": "1.0.0",
+  "description": "AI-powered Business Model Canvas generator",
+  "private": true,
+  "scripts": {
+    "dev": "npx -y serve .",
+    "start": "npx -y serve ."
+  }
+}
