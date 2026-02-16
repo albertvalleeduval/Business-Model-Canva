@@ -295,18 +295,33 @@
       throw new Error('Aucune clé API configurée. Ajoutez vos clés dans config.js.');
     }
 
+    // Default models if config is missing
+    var models = (typeof MODELS !== 'undefined' && Array.isArray(MODELS) && MODELS.length > 0)
+      ? MODELS
+      : ['mistralai/mistral-small-3.1-24b-instruct:free'];
+
     var truncated = text.substring(0, 12000);
     var startIndex = _keyIndex % keys.length;
+    var maxAttempts = keys.length * models.length; // Try all combinations if needed (limited generally by common sense, but let's be robust)
+    // To avoid infinite loops if we have many keys/models, let's cap at 5 retries max for UX
+    var hardLimit = 5;
     var tried = 0;
 
-    while (tried < keys.length) {
-      var idx = (startIndex + tried) % keys.length;
-      var key = keys[idx];
+    while (tried < hardLimit) {
+      // Rotation logic:
+      // Change Key every step
+      var keyIdx = (startIndex + tried) % keys.length;
+      var key = keys[keyIdx];
+
+      // Change Model every step too (or every N steps)
+      // Let's rotate models simply: tried % models.length
+      var modelIdx = tried % models.length;
+      var model = models[modelIdx];
 
       if (tried > 0) {
-        showToast('Optimisation de la connexion en cours…');
-        setProgress(45, 'Changement de clé… (clé ' + (idx + 1) + '/' + keys.length + ')');
-        await new Promise(function (r) { setTimeout(r, 1000); });
+        showToast('Optimisation... (Clé ' + (keyIdx + 1) + ' • ' + model.split('/')[1].split(':')[0] + ')');
+        setProgress(45, 'Tentative ' + (tried + 1) + '/' + hardLimit + ' avec un autre modèle IA...');
+        await new Promise(function (r) { setTimeout(r, 1000 + (tried * 1000)); }); // Progressive delay
       }
 
       try {
@@ -318,7 +333,7 @@
             'HTTP-Referer': window.location.href
           },
           body: JSON.stringify({
-            model: 'mistralai/mistral-small-3.1-24b-instruct:free',
+            model: model,
             messages: [
               { role: 'system', content: SYSTEM_PROMPT },
               { role: 'user', content: 'Voici le texte du document :\n\n' + truncated }
@@ -338,7 +353,7 @@
         }
 
         // Success — remember this key for next call
-        _keyIndex = idx;
+        _keyIndex = keyIdx;
 
         var data = await res.json();
         var raw = data.choices[0].message.content;
@@ -347,7 +362,7 @@
         return JSON.parse(jsonMatch[0]);
 
       } catch (err) {
-        // Network errors: try next key
+        // Network errors: try next
         if (err.message && (err.message.includes('429') || err.message.includes('503'))) {
           tried++;
           continue;
@@ -359,8 +374,7 @@
       }
     }
 
-    // All keys exhausted
-    throw new Error('Capacité IA saturée, réessayez dans 1 minute.');
+    throw new Error('Capacité IA saturée sur tous les modèles. Réessayez dans 1 minute.');
   }
 
   function callOpenRouter(text) {
