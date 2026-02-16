@@ -246,60 +246,125 @@
   }
 
   /* ═══════════════════════════════════════════════════
-     OPENROUTER API CALL
+     KEY ROTATION & API CALL (async/await)
   ═══════════════════════════════════════════════════ */
-  function callOpenRouter(text) {
-    return new Promise(function (resolve, reject) {
-      if (typeof CONFIG_OPENROUTER_KEY === 'undefined' || CONFIG_OPENROUTER_KEY === 'YOUR_OPENROUTER_API_KEY_HERE') {
-        return reject(new Error('Clé API OpenRouter manquante. Configurez config.js.'));
+  var _keyIndex = 0; // persists across calls within session
+
+  function getKeys() {
+    if (typeof API_KEYS !== 'undefined' && Array.isArray(API_KEYS) && API_KEYS.length > 0) {
+      return API_KEYS.filter(function (k) { return k && !k.includes('YOUR_'); });
+    }
+    // Legacy single-key fallback
+    if (typeof CONFIG_OPENROUTER_KEY !== 'undefined' && CONFIG_OPENROUTER_KEY !== 'YOUR_OPENROUTER_API_KEY_HERE') {
+      return [CONFIG_OPENROUTER_KEY];
+    }
+    return [];
+  }
+
+  function showToast(message) {
+    var existing = document.getElementById('rotation-toast');
+    if (existing) existing.remove();
+
+    var toast = document.createElement('div');
+    toast.id = 'rotation-toast';
+    toast.textContent = message;
+    toast.style.cssText =
+      'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);' +
+      'background:#1F2937;color:#fff;padding:10px 20px;border-radius:8px;' +
+      'font-size:13px;font-family:Inter,system-ui,sans-serif;z-index:9999;' +
+      'box-shadow:0 4px 16px rgba(0,0,0,.15);opacity:0;transition:opacity .3s;';
+    document.body.appendChild(toast);
+    requestAnimationFrame(function () { toast.style.opacity = '1'; });
+    setTimeout(function () {
+      toast.style.opacity = '0';
+      setTimeout(function () { toast.remove(); }, 350);
+    }, 3000);
+  }
+
+  var SYSTEM_PROMPT = 'Tu es un expert en stratégie d\'entreprise et en Business Model Canvas (Osterwalder). ' +
+    'À partir du texte fourni, remplis les 9 cases du Business Model Canvas. ' +
+    'Réponds UNIQUEMENT avec un objet JSON valide contenant les clés suivantes : ' +
+    'key_partnerships, key_activities, key_resources, value_propositions, ' +
+    'customer_relationships, channels, customer_segments, cost_structure, revenue_streams. ' +
+    'Chaque valeur doit être une chaîne de texte concise avec des bullet points (utilise "• " pour chaque item). ' +
+    'Ne retourne RIEN d\'autre que le JSON.';
+
+  async function fetchWithRotation(text) {
+    var keys = getKeys();
+    if (keys.length === 0) {
+      throw new Error('Aucune clé API configurée. Ajoutez vos clés dans config.js.');
+    }
+
+    var truncated = text.substring(0, 12000);
+    var startIndex = _keyIndex % keys.length;
+    var tried = 0;
+
+    while (tried < keys.length) {
+      var idx = (startIndex + tried) % keys.length;
+      var key = keys[idx];
+
+      if (tried > 0) {
+        showToast('Optimisation de la connexion en cours…');
+        setProgress(45, 'Changement de clé… (clé ' + (idx + 1) + '/' + keys.length + ')');
+        await new Promise(function (r) { setTimeout(r, 1000); });
       }
 
-      var systemPrompt = 'Tu es un expert en stratégie d\'entreprise et en Business Model Canvas (Osterwalder). ' +
-        'À partir du texte fourni, remplis les 9 cases du Business Model Canvas. ' +
-        'Réponds UNIQUEMENT avec un objet JSON valide contenant les clés suivantes : ' +
-        'key_partnerships, key_activities, key_resources, value_propositions, ' +
-        'customer_relationships, channels, customer_segments, cost_structure, revenue_streams. ' +
-        'Chaque valeur doit être une chaîne de texte concise avec des bullet points (utilise "• " pour chaque item). ' +
-        'Ne retourne RIEN d\'autre que le JSON.';
-
-      var truncated = text.substring(0, 12000);
-
-      fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + CONFIG_OPENROUTER_KEY,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': window.location.href
-        },
-        body: JSON.stringify({
-          model: 'mistralai/mistral-small-3.1-24b-instruct:free',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: 'Voici le texte du document :\n\n' + truncated }
-          ],
-          temperature: 0.3,
-          max_tokens: 2048
-        })
-      })
-        .then(function (res) {
-          if (!res.ok) return reject(new Error('Erreur API OpenRouter (HTTP ' + res.status + ')'));
-          return res.json();
-        })
-        .then(function (data) {
-          try {
-            var raw = data.choices[0].message.content;
-            var jsonMatch = raw.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) return reject(new Error('L\'IA n\'a pas renvoyé de JSON valide.'));
-            var parsed = JSON.parse(jsonMatch[0]);
-            resolve(parsed);
-          } catch (_) {
-            reject(new Error('Impossible de parser la réponse de l\'IA.'));
-          }
-        })
-        .catch(function (err) {
-          reject(err.message ? err : new Error('Erreur réseau lors de l\'appel à OpenRouter.'));
+      try {
+        var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + key,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': window.location.href
+          },
+          body: JSON.stringify({
+            model: 'mistralai/mistral-small-3.1-24b-instruct:free',
+            messages: [
+              { role: 'system', content: SYSTEM_PROMPT },
+              { role: 'user', content: 'Voici le texte du document :\n\n' + truncated }
+            ],
+            temperature: 0.3,
+            max_tokens: 2048
+          })
         });
-    });
+
+        if (res.status === 429 || res.status === 503) {
+          tried++;
+          continue;
+        }
+
+        if (!res.ok) {
+          throw new Error('Erreur API OpenRouter (HTTP ' + res.status + ')');
+        }
+
+        // Success — remember this key for next call
+        _keyIndex = idx;
+
+        var data = await res.json();
+        var raw = data.choices[0].message.content;
+        var jsonMatch = raw.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error('L\'IA n\'a pas renvoyé de JSON valide.');
+        return JSON.parse(jsonMatch[0]);
+
+      } catch (err) {
+        // Network errors: try next key
+        if (err.message && (err.message.includes('429') || err.message.includes('503'))) {
+          tried++;
+          continue;
+        }
+        // For non-retryable errors, stop
+        if (err.message && err.message.includes('HTTP')) throw err;
+        if (err instanceof SyntaxError) throw new Error('Impossible de parser la réponse de l\'IA.');
+        tried++;
+      }
+    }
+
+    // All keys exhausted
+    throw new Error('Capacité IA saturée, réessayez dans 1 minute.');
+  }
+
+  function callOpenRouter(text) {
+    return fetchWithRotation(text);
   }
 
   /* ═══════════════════════════════════════════════════

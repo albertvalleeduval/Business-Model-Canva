@@ -1,8 +1,13 @@
 /* ═══════════════════════════════════════════════════
-   config.js — API Configuration (DO NOT COMMIT)
+   config.js — API Key Pool
    ═══════════════════════════════════════════════════
-   Copy this file and replace the placeholder with
-   your actual OpenRouter API key.
+   Add your OpenRouter API keys below.
+   Multiple keys enable automatic rotation when
+   rate limits (429) are hit.
    ═══════════════════════════════════════════════════ */
 
-var CONFIG_OPENROUTER_KEY = '***REMOVED***';
+var API_KEYS = [
+   '***REMOVED***'
+   // 'sk-or-v1-YOUR_SECOND_KEY',
+   // 'sk-or-v1-YOUR_THIRD_KEY',
+];
