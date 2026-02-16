@@ -1,9 +1,6 @@
 # Dependencies
 node_modules/
 
-# API Keys — NEVER commit
-config.js
-
 # Build output
 dist/
 build/
