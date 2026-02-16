@@ -1,5 +1,6 @@
 /* ═══════════════════════════════════════════════════
-   Business Model Canvas — Styles
+   Business Model Canvas — AI-Powered Edition
+   Stylesheet for Astry Agency
    ═══════════════════════════════════════════════════ */
 
 /* ── Reset & Base ───────────────────────────────── */
@@ -13,11 +14,318 @@
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: #ffffff;
+  background: #F8F9FB;
   color: #1F2937;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ═══════════════════════════════════════════════════
+   LANDING PAGE
+═══════════════════════════════════════════════════ */
+#landing-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #F8F9FB 0%, #EEF0F6 50%, #E8EAF6 100%);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle dot pattern */
+#landing-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, #d1d5db 0.8px, transparent 0.8px);
+  background-size: 24px 24px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.landing-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 640px;
+}
+
+.landing-brand {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #6366F1;
+  margin-bottom: 1rem;
+}
+
+.landing-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.landing-subtitle {
+  font-size: 1.05rem;
+  color: #6B7280;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.landing-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-manual {
+  background: #ffffff;
+  color: #374151;
+  border: 1.5px solid #E5E7EB;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.btn-manual:hover {
+  border-color: #D1D5DB;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+}
+
+.btn-ai {
+  background: linear-gradient(135deg, #6366F1 0%, #818CF8 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+}
+
+.btn-ai:hover {
+  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════
+   AI UPLOAD MODAL
+═══════════════════════════════════════════════════ */
+#ai-upload-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #F8F9FB 0%, #EEF0F6 50%, #E8EAF6 100%);
+  padding: 2rem;
+  position: relative;
+}
+
+#ai-upload-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, #d1d5db 0.8px, transparent 0.8px);
+  background-size: 24px 24px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.upload-card {
+  position: relative;
+  z-index: 1;
+  background: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: 1rem;
+  padding: 2.5rem;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+}
+
+.upload-card h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.4rem;
+}
+
+.upload-card p {
+  font-size: 0.85rem;
+  color: #6B7280;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Dropzone ──────────────────────────────────── */
+.dropzone {
+  border: 2px dashed #D1D5DB;
+  border-radius: 0.75rem;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: #FAFBFC;
+  position: relative;
+}
+
+.dropzone:hover,
+.dropzone.drag-over {
+  border-color: #818CF8;
+  background: #F5F3FF;
+}
+
+.dropzone-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.dropzone-text {
+  font-size: 0.85rem;
+  color: #6B7280;
+}
+
+.dropzone-text strong {
+  color: #6366F1;
+  cursor: pointer;
+}
+
+.dropzone-hint {
+  font-size: 0.7rem;
+  color: #9CA3AF;
+  margin-top: 0.4rem;
+}
+
+.dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ── File Info Badge ───────────────────────────── */
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.6rem 0.8rem;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  color: #166534;
+}
+
+.file-info.error {
+  background: #FEF2F2;
+  border-color: #FECACA;
+  color: #991B1B;
+}
+
+/* ── AI Progress ────────────────────────────────── */
+.ai-progress {
+  margin-top: 1.5rem;
+}
+
+.ai-progress .progress-bar-track {
+  width: 100%;
+  height: 6px;
+  background: #E5E7EB;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.ai-progress .progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366F1, #818CF8);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+.ai-progress .progress-label {
+  font-size: 0.75rem;
+  color: #6B7280;
+  text-align: center;
+}
+
+.upload-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.btn-back {
+  padding: 0.6rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid #E5E7EB;
+  background: #ffffff;
+  color: #374151;
+  transition: border-color 0.15s;
+}
+
+.btn-back:hover {
+  border-color: #D1D5DB;
+}
+
+.btn-generate {
+  flex: 1;
+  padding: 0.6rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: linear-gradient(135deg, #6366F1, #818CF8);
+  color: #ffffff;
+  transition: opacity 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.25);
+}
+
+.btn-generate:hover {
+  box-shadow: 0 4px 18px rgba(99, 102, 241, 0.35);
+}
+
+.btn-generate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ═══════════════════════════════════════════════════
+   CANVAS SCREEN
+═══════════════════════════════════════════════════ */
+#canvas-screen {
+  padding: 1.25rem 1.5rem;
+  background: #ffffff;
+  min-height: 100vh;
 }
 
 /* ── Canvas Grid ────────────────────────────────── */
@@ -25,22 +333,57 @@ body {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(6, 1fr);
-  gap: 1rem;
-  height: calc(100vh - 160px);
+  gap: 0.65rem;
+  height: calc(100vh - 140px);
   min-height: 480px;
 }
 
-.block-kp   { grid-column: 1 / 3;  grid-row: 1 / 5; }
-.block-ka   { grid-column: 3 / 5;  grid-row: 1 / 3; }
-.block-kr   { grid-column: 3 / 5;  grid-row: 3 / 5; }
-.block-vp   { grid-column: 5 / 7;  grid-row: 1 / 5; }
-.block-cr   { grid-column: 7 / 9;  grid-row: 1 / 3; }
-.block-ch   { grid-column: 7 / 9;  grid-row: 3 / 5; }
-.block-cs   { grid-column: 9 / 11; grid-row: 1 / 5; }
-.block-cost { grid-column: 1 / 6;  grid-row: 5 / 7; }
-.block-rev  { grid-column: 6 / 11; grid-row: 5 / 7; }
+.block-kp {
+  grid-column: 1 / 3;
+  grid-row: 1 / 5;
+}
 
-/* ── Card Styling ───────────────────────────────── */
+.block-ka {
+  grid-column: 3 / 5;
+  grid-row: 1 / 3;
+}
+
+.block-kr {
+  grid-column: 3 / 5;
+  grid-row: 3 / 5;
+}
+
+.block-vp {
+  grid-column: 5 / 7;
+  grid-row: 1 / 5;
+}
+
+.block-cr {
+  grid-column: 7 / 9;
+  grid-row: 1 / 3;
+}
+
+.block-ch {
+  grid-column: 7 / 9;
+  grid-row: 3 / 5;
+}
+
+.block-cs {
+  grid-column: 9 / 11;
+  grid-row: 1 / 5;
+}
+
+.block-cost {
+  grid-column: 1 / 6;
+  grid-row: 5 / 7;
+}
+
+.block-rev {
+  grid-column: 6 / 11;
+  grid-row: 5 / 7;
+}
+
+/* ── Bento Card ─────────────────────────────────── */
 .bmc-card {
   background: #F9FAFB;
   border: 1px solid #E5E7EB;
@@ -53,37 +396,37 @@ body {
 
 .bmc-card:hover {
   border-color: #D1D5DB;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .bmc-card:focus-within {
   border-color: #818CF8;
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.12);
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
 }
 
 /* ── Card Header ────────────────────────────────── */
 .card-header {
-  padding: 12px 14px 8px;
+  padding: 10px 12px 7px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   flex-shrink: 0;
   border-bottom: 1px solid #F3F4F6;
 }
 
 .card-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   flex-shrink: 0;
 }
 
 .card-header h2 {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -91,12 +434,12 @@ body {
   line-height: 1.2;
 }
 
-/* ── Editable Content Area ──────────────────────── */
+/* ── Editable Content ───────────────────────────── */
 .editable {
   flex: 1;
-  padding: 8px 14px 10px;
+  padding: 6px 12px 8px;
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.5;
   color: #374151;
   outline: none;
   overflow: hidden;
@@ -110,7 +453,7 @@ body {
   color: #9CA3AF;
   pointer-events: none;
   font-style: italic;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 /* ── Header Fields ──────────────────────────────── */
@@ -122,12 +465,12 @@ body {
   font-size: 13px;
   color: #1F2937;
   border-radius: 4px;
-  background: #F9FAFB;
+  background: #F3F4F6;
   transition: border-color 0.2s, background 0.2s;
 }
 
 .header-field:hover {
-  background: #F3F4F6;
+  background: #E5E7EB;
 }
 
 .header-field:focus {
@@ -141,37 +484,65 @@ body {
   font-style: italic;
 }
 
-/* ── Export Button ──────────────────────────────── */
-#export-btn {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+/* ── Toolbar Buttons ────────────────────────────── */
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.12s, box-shadow 0.12s;
 }
 
-#export-btn:hover {
+.toolbar-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
 }
 
-#export-btn:active {
+.toolbar-btn:active {
   transform: translateY(0);
 }
 
-#export-btn:disabled {
-  opacity: 0.6;
+.toolbar-btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
 }
 
-/* ── Hide button during PDF export ──────────────── */
-.exporting #export-btn {
+.toolbar-btn-export {
+  background: linear-gradient(135deg, #6366F1, #818CF8);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.2);
+}
+
+.toolbar-btn-export:hover {
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+}
+
+.toolbar-btn-new {
+  background: #ffffff;
+  color: #374151;
+  border: 1.5px solid #E5E7EB;
+}
+
+.toolbar-btn-new:hover {
+  border-color: #D1D5DB;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* ── Hide during export ──────────────────────────── */
+.exporting .canvas-toolbar {
   display: none !important;
 }
 
-/* ── Spinner for export loading state ───────────── */
+/* ── Spinner ──────────────────────────────────────── */
 .spinner {
   display: inline-block;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: #ffffff;
   border-radius: 50%;
@@ -179,16 +550,29 @@ body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* ── Print / PDF Tweaks ─────────────────────────── */
+/* ── Screen visibility toggle ──────────────────── */
+.screen-hidden {
+  display: none !important;
+}
+
+/* ── Print / PDF ────────────────────────────────── */
 @media print {
-  #export-btn { display: none !important; }
-  body { padding: 0; }
+  .canvas-toolbar {
+    display: none !important;
+  }
+
+  body {
+    padding: 0;
+    background: #fff;
+  }
 }
 
-/* ── Responsive: stack on small screens ─────────── */
+/* ── Responsive ─────────────────────────────────── */
 @media (max-width: 768px) {
   #canvas-grid {
     grid-template-columns: 1fr;
@@ -196,14 +580,24 @@ body {
     height: auto;
   }
 
-  .block-kp, .block-ka, .block-kr, .block-vp,
-  .block-cr, .block-ch, .block-cs, .block-cost,
+  .block-kp,
+  .block-ka,
+  .block-kr,
+  .block-vp,
+  .block-cr,
+  .block-ch,
+  .block-cs,
+  .block-cost,
   .block-rev {
     grid-column: 1 / -1;
     grid-row: auto;
   }
 
   .bmc-card {
-    min-height: 120px;
+    min-height: 110px;
+  }
+
+  .landing-title {
+    font-size: 1.75rem;
   }
 }

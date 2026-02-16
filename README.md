@@ -1,6 +1,7 @@
-# Business Model Canvas — Interactive Web App
+# Business Model Canvas — AI-Powered Edition
 
-An interactive, editable **Business Model Canvas** built with vanilla HTML, CSS, and JavaScript. Designed for fast iteration and easy deployment.
+An interactive, **AI-powered** Business Model Canvas tool built for **Astry Agency**.  
+Upload a PDF describing your project and let AI fill the 9 blocks for you, or use manual mode.
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
@@ -10,12 +11,15 @@ An interactive, editable **Business Model Canvas** built with vanilla HTML, CSS,
 
 | Feature | Description |
 |---|---|
-| **9‑block BMC grid** | Standard Strategyzer layout reproduced with CSS Grid |
-| **Inline editing** | Every block is `contenteditable` — just click and type |
-| **Auto‑scaling text** | Font size adjusts automatically (12–18 px) to prevent overflow |
-| **Persistent data** | Content saved to `localStorage` on every keystroke |
-| **PDF export** | One‑click A4 landscape export via [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) |
-| **Responsive** | Stacks to single‑column on mobile devices |
+| **Landing page** | Choose between Manual mode or AI-powered generation |
+| **AI generation** | Upload a PDF → text is extracted → OpenRouter API fills the 9 blocks |
+| **PDF extraction** | Uses pdf.js — supports up to 15 pages |
+| **9-block BMC grid** | Standard Strategyzer layout via CSS Grid |
+| **Inline editing** | Every block is `contenteditable` |
+| **Auto-scaling** | Font size auto-adjusts (10–18 px) to prevent overflow |
+| **Persistent data** | localStorage saves on every keystroke |
+| **PDF export** | A4 landscape via html2pdf.js |
+| **Responsive** | Stacks to single-column on mobile |
 
 ---
 
@@ -23,12 +27,25 @@ An interactive, editable **Business Model Canvas** built with vanilla HTML, CSS,
 
 ```
 BMC/
-├── index.html      ← Main page (imports CSS & JS)
-├── style.css       ← Layout, cards, responsive rules
-├── app.js          ← Auto‑scale, localStorage, PDF export
-├── README.md       ← This file
-└── .gitignore
+├── index.html      ← 3-screen layout (Landing → AI Upload → Canvas)
+├── style.css       ← All styles (landing, upload, canvas, responsive)
+├── app.js          ← Full application logic
+├── config.js       ← API key (⚠️ excluded from git)
+├── .gitignore
+└── README.md
 ```
+
+---
+
+## 🔑 Configuration
+
+1. Create a `config.js` file at the project root (it's git-ignored):
+
+```js
+var CONFIG_OPENROUTER_KEY = 'sk-or-v1-your-key-here';
+```
+
+2. Get your free API key from [openrouter.ai](https://openrouter.ai/).
 
 ---
 
@@ -36,27 +53,24 @@ BMC/
 
 ### Local preview
 
-Simply open `index.html` in any modern browser — no build step needed.
+Open `index.html` in any modern browser — no build step needed.
 
 ### Deploy on Vercel
 
-1. Push this repository to GitHub.
-2. Import the repo in [vercel.com/new](https://vercel.com/new).
-3. Vercel auto‑detects a static site — no configuration required.
-4. Your canvas is live! 🎉
-
-> **All asset paths are relative** (`./style.css`, `./app.js`), so the project works out of the box on any static hosting platform.
+1. Push this repo to GitHub.
+2. Import at [vercel.com/new](https://vercel.com/new).
+3. **Important**: Add `config.js` manually to your deployed instance or use environment headers.
 
 ---
 
 ## 🛠 Tech Stack
 
-- **HTML5** — Semantic markup
-- **Tailwind CSS** (CDN) — Utility classes
-- **Vanilla CSS** — Grid layout & custom styling
-- **Vanilla JavaScript** — Zero dependencies for core logic
-- **html2pdf.js** (CDN) — PDF generation
-- **Google Fonts** — Inter typeface
+- **HTML5** + **Tailwind CSS** (CDN)
+- **Vanilla JavaScript**
+- **pdf.js** (CDN) — PDF text extraction
+- **html2pdf.js** (CDN) — PDF export
+- **OpenRouter API** — LLM inference (Llama 3 70B)
+- **Google Fonts** — Inter
 
 ---
 
