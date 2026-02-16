@@ -14,6 +14,7 @@ var API_KEYS = [
 
 var MODELS = [
    'mistralai/mistral-small-3.1-24b-instruct:free',
-   'openai/gpt-oss-120b:free',
-   'qwen/qwen3-coder:free'
+   'google/gemini-2.0-flash-lite-preview-02-05:free',
+   'meta-llama/llama-3.1-8b-instruct:free',
+   'qwen/qwen-2.5-coder-32b-instruct:free'
 ];
