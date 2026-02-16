@@ -343,7 +343,7 @@
           })
         });
 
-        if (res.status === 429 || res.status === 503 || res.status === 404) {
+        if (res.status === 429 || res.status === 503 || res.status === 404 || res.status === 402) {
           console.warn('Erreur ' + res.status + ' sur le modèle ' + model + ', passage au suivant.');
           tried++;
           continue;
