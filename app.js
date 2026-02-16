@@ -290,6 +290,11 @@
     'Ne retourne RIEN d\'autre que le JSON.';
 
   async function fetchWithRotation(text) {
+    // 1. DATA VALIDATION
+    if (!text || typeof text !== 'string' || text.trim().length === 0) {
+      throw new Error('Le texte à analyser est vide.');
+    }
+
     var keys = getKeys();
     if (keys.length === 0) {
       throw new Error('Aucune clé API configurée. Ajoutez vos clés dans config.js.');
@@ -302,27 +307,47 @@
 
     var truncated = text.substring(0, 12000);
     var startIndex = _keyIndex % keys.length;
-    var maxAttempts = keys.length * models.length; // Try all combinations if needed (limited generally by common sense, but let's be robust)
-    // To avoid infinite loops if we have many keys/models, let's cap at 5 retries max for UX
+
+    // Cap retries
     var hardLimit = 5;
     var tried = 0;
 
     while (tried < hardLimit) {
-      // Rotation logic:
-      // Change Key every step
+      // Rotation logic
       var keyIdx = (startIndex + tried) % keys.length;
       var key = keys[keyIdx];
-
-      // Change Model every step too (or every N steps)
-      // Let's rotate models simply: tried % models.length
       var modelIdx = tried % models.length;
       var model = models[modelIdx];
 
-      if (tried > 0) {
-        showToast('Optimisation... (Clé ' + (keyIdx + 1) + ' • ' + model.split('/')[1].split(':')[0] + ')');
-        setProgress(45, 'Tentative ' + (tried + 1) + '/' + hardLimit + ' avec un autre modèle IA...');
-        await new Promise(function (r) { setTimeout(r, 1000 + (tried * 1000)); }); // Progressive delay
+      // Validate Key
+      if (typeof key !== 'string' || key.trim() === '') {
+        console.warn('Clé invalide détectée (index ' + keyIdx + '), passage à la suivante.');
+        tried++;
+        continue;
       }
+
+      if (tried > 0) {
+        var msg = 'Essai avec la clé ' + (keyIdx + 1) + ' et le modèle ' + model.split('/')[1] + '...';
+        console.log(msg);
+        showToast('Optimisation... (' + model.split('/')[1].split(':')[0] + ')');
+        setProgress(45, msg);
+        await new Promise(function (r) { setTimeout(r, 1000 + (tried * 1000)); });
+      }
+
+      // 2. REQUEST STRUCTURE
+      var requestBody = {
+        model: model,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: truncated }
+        ],
+        // Keeping standard params but ensuring they are numbers
+        temperature: 0.3,
+        max_tokens: 2048
+      };
+
+      // 3. DEBUG LOGGING
+      console.log("Request Body:", JSON.stringify(requestBody, null, 2));
 
       try {
         var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -332,50 +357,54 @@
             'Content-Type': 'application/json',
             'HTTP-Referer': window.location.href
           },
-          body: JSON.stringify({
-            model: model,
-            messages: [
-              { role: 'system', content: SYSTEM_PROMPT },
-              { role: 'user', content: 'Voici le texte du document :\n\n' + truncated }
-            ],
-            temperature: 0.3,
-            max_tokens: 2048
-          })
+          body: JSON.stringify(requestBody)
         });
 
-        if (res.status === 429 || res.status === 503 || res.status === 404 || res.status === 402) {
+        // Handle specific error codes for rotation
+        if ([402, 404, 429, 503].includes(res.status)) {
           console.warn('Erreur ' + res.status + ' sur le modèle ' + model + ', passage au suivant.');
           tried++;
           continue;
         }
 
         if (!res.ok) {
-          throw new Error('Erreur API OpenRouter (HTTP ' + res.status + ')');
+          // Capture precise error details
+          var errorDetail = await res.text();
+          console.error("API Error Detail:", errorDetail);
+          throw new Error('Erreur API OpenRouter (HTTP ' + res.status + '): ' + errorDetail);
         }
 
         // Success — remember this key for next call
         _keyIndex = keyIdx;
 
         var data = await res.json();
+
+        if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+          console.error("Invalid API Response:", data);
+          throw new Error('Réponse API invalide (structure inattendue).');
+        }
+
         var raw = data.choices[0].message.content;
         var jsonMatch = raw.match(/\{[\s\S]*\}/);
         if (!jsonMatch) throw new Error('L\'IA n\'a pas renvoyé de JSON valide.');
+
         return JSON.parse(jsonMatch[0]);
 
       } catch (err) {
-        // Network errors: try next
+        console.error("Fetch Error:", err);
+
+        // Network errors or specific retryable errors
         if (err.message && (err.message.includes('429') || err.message.includes('503'))) {
           tried++;
           continue;
         }
-        // For non-retryable errors, stop
-        if (err.message && err.message.includes('HTTP')) throw err;
-        if (err instanceof SyntaxError) throw new Error('Impossible de parser la réponse de l\'IA.');
+
+        // Non-retryable
         tried++;
       }
     }
 
-    throw new Error('Capacité IA saturée sur tous les modèles. Réessayez dans 1 minute.');
+    throw new Error('Capacité IA saturée sur tous les modèles. Veuillez vérifier vos clés ou réessayer plus tard.');
   }
 
   function callOpenRouter(text) {
