@@ -61,16 +61,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Auto-resize
   setupAutoResize();
+
+  // Handle Back Button (User Request)
+  window.addEventListener('popstate', (event) => {
+    if (event.state && event.state.screenId) {
+      showScreen(event.state.screenId, false);
+    } else {
+      showScreen('landing-screen', false);
+    }
+  });
 });
 
 /* ═══════════════════════════════════════════════════
    NAVIGATION
 ═══════════════════════════════════════════════════ */
-function showScreen(screenId) {
+function showScreen(screenId, addToHistory = true) {
   document.getElementById('landing-screen').classList.add('screen-hidden');
   document.getElementById('ai-upload-screen').classList.add('screen-hidden');
   document.getElementById('canvas-screen').classList.add('screen-hidden');
   document.getElementById(screenId).classList.remove('screen-hidden');
+
+  if (addToHistory) {
+    history.pushState({ screenId }, '', '#' + screenId);
+  }
+
+  // Ensure icons are always visible after navigation
+  if (window.lucide) window.lucide.createIcons();
 }
 
 /* ═══════════════════════════════════════════════════
@@ -288,7 +304,8 @@ function autoResize(el) {
   // Simple logic: reduce font size if overflow
   let size = 18;
   el.style.fontSize = size + 'px';
-  while (el.scrollHeight > el.clientHeight && size > 10) {
+  // Allow down to 9px as requested
+  while (el.scrollHeight > el.clientHeight && size > 9) {
     size--;
     el.style.fontSize = size + 'px';
   }
