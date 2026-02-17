@@ -422,27 +422,32 @@ function exportPdf() {
   // Fix: Ensure icons are present before capture
   if (window.lucide) window.lucide.createIcons();
 
-  // Force scaling before export
+  // Force scaling
   autoScaleAllBoxes();
 
-  // FIX: Force Desktop Mode for PDF
-  document.body.classList.add('pdf-export-mode');
+  // 1. Activate "A4 Sheet" mode
+  document.body.classList.add('printing');
 
-  const opt = {
-    margin: 0,
-    filename: 'mon-bmc.pdf',
-    image: { type: 'jpeg', quality: 1 },
-    html2canvas: { scale: 2, useCORS: true, windowWidth: 1600, width: 1600, scrollY: 0 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-  };
+  // 2. Wait for CSS to apply
+  setTimeout(() => {
+    const opt = {
+      margin: 0,
+      filename: 'Mon_Business_Model_Canvas.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2, // Better quality
+        useCORS: true,
+        scrollY: 0,
+        windowWidth: 1123, // ~297mm at 96DPI
+        windowHeight: 794  // ~210mm at 96DPI
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    };
 
-  // Hide toolbar for export
-  document.querySelector('.canvas-toolbar').style.display = 'none';
-
-  // Use global html2pdf
-  window.html2pdf().from(element).set(opt).save().then(() => {
-    spinner.style.display = 'none';
-    document.querySelector('.canvas-toolbar').style.display = 'flex';
-    document.body.classList.remove('pdf-export-mode');
-  });
+    // 3. Generate and clean up
+    window.html2pdf().set(opt).from(element).save().then(() => {
+      document.body.classList.remove('printing');
+      spinner.style.display = 'none';
+    });
+  }, 100);
 }

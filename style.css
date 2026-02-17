@@ -623,6 +623,35 @@ body {
   grid-row: 1 / 5 !important;
 }
 
+
+/* ── FORCE BRUTE PDF (User Request) ── */
+body.printing {
+  width: 297mm !important;
+  height: 210mm !important;
+  overflow: hidden !important;
+  background: white !important;
+}
+
+body.printing #bmc-root {
+  width: 297mm !important;
+  height: 210mm !important;
+  margin: 0 !important;
+  padding: 10mm !important;
+  box-shadow: none !important;
+  border: none !important;
+  display: grid !important;
+  aspect-ratio: auto !important;
+  /* Override previous aspect ratio if needed */
+}
+
+/* Hide toolbar and other UI during forced print */
+body.printing .canvas-toolbar,
+body.printing #landing-screen,
+body.printing #ai-upload-screen,
+body.printing .btn-back {
+  display: none !important;
+}
+
 .pdf-export-mode .block-ka {
   grid-column: 3 / 5 !important;
   grid-row: 1 / 3 !important;
