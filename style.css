@@ -331,8 +331,9 @@ body {
 #bmc-root {
   background: #ffffff;
   /* Fixed Aspect Ratio for PDF A4 Landscape consistency (Scale: 1.414) */
-  aspect-ratio: 1.414 / 1;
   width: 100%;
+  aspect-ratio: 1.414 / 1;
+  height: auto;
   max-width: 1400px;
   /* Prevent it from being too huge on large screens */
   margin: 0 auto;

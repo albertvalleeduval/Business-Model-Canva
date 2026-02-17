@@ -157,6 +157,7 @@ function updateProgress(pct, msg, bar, label) {
 
 const SYSTEM_PROMPT = `Tu es un expert en stratégie d'entreprise.
 Remplis le Business Model Canvas (Osterwalder) à partir du texte fourni.
+IMPORTANT : Ne JAMAIS utiliser d'emojis, de puces (•) ou de symboles spéciaux. Formate tes réponses uniquement avec du texte brut et des retours à la ligne.
 Réponds UNIQUEMENT via un JSON valide (sans markdown, sans entête).
 Clés requises : key_partnerships, key_activities, key_resources, value_propositions, customer_relationships, channels, customer_segments, cost_structure, revenue_streams.`;
 
@@ -237,10 +238,17 @@ function fillCanvas(data) {
   for (const [key, id] of Object.entries(BMC_MAP)) {
     if (data[key]) {
       const el = document.getElementById(id);
-      if (el) el.innerHTML = formatList(data[key]);
+      if (el) {
+        el.innerHTML = formatList(data[key]);
+        // Auto-scale immediately after filling
+        autoResize(el);
+      }
     }
   }
   saveToStorage();
+
+  // Refresh icons and UI if needed
+  if (window.lucide) window.lucide.createIcons();
 }
 
 function formatList(txt) {
@@ -368,7 +376,7 @@ function exportPdf() {
     margin: 0,
     filename: 'business-model-canvas.pdf',
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 3, useCORS: true },
+    html2canvas: { scale: 2, useCORS: true },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
   };
 
