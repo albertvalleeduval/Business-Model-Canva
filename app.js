@@ -399,11 +399,14 @@ function exportPdf() {
   // Force scaling before export
   autoScaleAllBoxes();
 
+  // FIX: Force Desktop Mode for PDF
+  document.body.classList.add('pdf-export-mode');
+
   const opt = {
     margin: 0,
     filename: 'mon-bmc.pdf',
     image: { type: 'jpeg', quality: 1 },
-    html2canvas: { scale: 2, useCORS: true },
+    html2canvas: { scale: 2, useCORS: true, windowWidth: 1600, width: 1600, scrollY: 0 },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
   };
 
@@ -414,5 +417,6 @@ function exportPdf() {
   window.html2pdf().from(element).set(opt).save().then(() => {
     spinner.style.display = 'none';
     document.querySelector('.canvas-toolbar').style.display = 'flex';
+    document.body.classList.remove('pdf-export-mode');
   });
 }
