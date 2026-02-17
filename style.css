@@ -610,84 +610,39 @@ body {
   }
 }
 
-/* ── PDF Export Override (Force Desktop Layout) ── */
-.pdf-export-mode #canvas-grid {
-  display: grid !important;
-  grid-template-columns: repeat(10, 1fr) !important;
-  grid-template-rows: repeat(6, 1fr) !important;
-  height: auto !important;
-}
-
-.pdf-export-mode .block-kp {
-  grid-column: 1 / 3 !important;
-  grid-row: 1 / 5 !important;
-}
-
-
-/* ── FORCE BRUTE PDF (User Request) ── */
-body.printing {
+/* ── PDF EXPORT — Zoom Out Method (Final) ─────── */
+/* Activé UNIQUEMENT pendant l'export via JS */
+body.pdf-mode {
   width: 297mm !important;
   height: 210mm !important;
   overflow: hidden !important;
-  background: white !important;
 }
 
-body.printing #bmc-root {
-  width: 297mm !important;
-  height: 210mm !important;
+body.pdf-mode #bmc-root {
+  width: 1400px !important;
+  /* L'ASTUCE : Dézoom pour faire rentrer 1400px dans 297mm */
+  transform: scale(0.75) !important;
+  transform-origin: top left !important;
   margin: 0 !important;
-  padding: 10mm !important;
+  padding: 20px !important;
   box-shadow: none !important;
   border: none !important;
-  display: grid !important;
+  background: white !important;
   aspect-ratio: auto !important;
-  /* Override previous aspect ratio if needed */
+  max-width: none !important;
 }
 
-/* Hide toolbar and other UI during forced print */
-body.printing .canvas-toolbar,
-body.printing #landing-screen,
-body.printing #ai-upload-screen,
-body.printing .btn-back {
+body.pdf-mode #canvas-grid {
+  display: grid !important;
+  grid-template-columns: repeat(10, 1fr) !important;
+  grid-template-rows: repeat(6, 1fr) !important;
+  height: 600px !important;
+}
+
+/* Cache tout ce qui n'est pas le BMC */
+body.pdf-mode .canvas-toolbar,
+body.pdf-mode #landing-screen,
+body.pdf-mode #ai-upload-screen,
+body.pdf-mode .btn-back {
   display: none !important;
-}
-
-.pdf-export-mode .block-ka {
-  grid-column: 3 / 5 !important;
-  grid-row: 1 / 3 !important;
-}
-
-.pdf-export-mode .block-kr {
-  grid-column: 3 / 5 !important;
-  grid-row: 3 / 5 !important;
-}
-
-.pdf-export-mode .block-vp {
-  grid-column: 5 / 7 !important;
-  grid-row: 1 / 5 !important;
-}
-
-.pdf-export-mode .block-cr {
-  grid-column: 7 / 9 !important;
-  grid-row: 1 / 3 !important;
-}
-
-.pdf-export-mode .block-ch {
-  grid-column: 7 / 9 !important;
-  grid-row: 3 / 5 !important;
-}
-
-.pdf-export-mode .block-cs {
-  grid-column: 9 / 11 !important;
-  grid-row: 1 / 5 !important;
-}
-
-.pdf-export-mode .block-cost {
-  grid-column: 1 / 6 !important;
-  grid-row: 5 / 7 !important;
-}
-
-.pdf-export-mode .block-rev {
-  grid-column: 6 / 11 !important;
-  grid-row: 5 / 7 !important;
 }
