@@ -1,10 +1,21 @@
 {
-  "name": "business-model-canvas",
+  "name": "astry-bmc-ai",
   "version": "1.0.0",
-  "description": "AI-powered Business Model Canvas generator",
-  "private": true,
+  "description": "AI-Powered Business Model Canvas by Astry",
+  "main": "app.js",
   "scripts": {
-    "dev": "npx -y serve .",
-    "start": "npx -y serve ."
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "html2pdf.js": "^0.10.1",
+    "pdfjs-dist": "^3.11.174"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "tailwindcss": "^3.4.1",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35"
   }
 }

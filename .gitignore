@@ -1,9 +1,15 @@
 # Dependencies
 node_modules/
+.DS_Store
 
-# Build output
+# Production
 dist/
-build/
+dist-ssr/
+
+# Local Env
+config.js
+.env
+.env.local
 .vercel/
 
 # OS files

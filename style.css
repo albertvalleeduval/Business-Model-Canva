@@ -328,6 +328,16 @@ body {
   min-height: 100vh;
 }
 
+#bmc-root {
+  background: #ffffff;
+  /* Fixed Aspect Ratio for PDF A4 Landscape consistency (Scale: 1.414) */
+  aspect-ratio: 1.414 / 1;
+  width: 100%;
+  max-width: 1400px;
+  /* Prevent it from being too huge on large screens */
+  margin: 0 auto;
+}
+
 /* ── Canvas Grid ────────────────────────────────── */
 #canvas-grid {
   display: grid;
@@ -414,15 +424,12 @@ body {
   border-bottom: 1px solid #F3F4F6;
 }
 
-.card-icon {
-  width: 22px;
-  height: 22px;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  flex-shrink: 0;
+.card-icon-lucide {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 .card-header h2 {

@@ -27,6 +27,8 @@
 
   <!-- Project Stylesheet -->
   <link rel="stylesheet" href="./style.css" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
@@ -129,7 +131,7 @@
       <main id="canvas-grid">
         <section class="bmc-card block-kp">
           <div class="card-header">
-            <span class="card-icon bg-violet-100 text-violet-600">🤝</span>
+            <i data-lucide="users" class="card-icon-lucide text-violet-600"></i>
             <h2>Key Partnerships</h2>
           </div>
           <div class="editable" contenteditable="true" id="block-kp"
@@ -138,7 +140,7 @@
 
         <section class="bmc-card block-ka">
           <div class="card-header">
-            <span class="card-icon bg-blue-100 text-blue-600">⚡</span>
+            <i data-lucide="zap" class="card-icon-lucide text-blue-600"></i>
             <h2>Key Activities</h2>
           </div>
           <div class="editable" contenteditable="true" id="block-ka"
@@ -147,7 +149,7 @@
 
         <section class="bmc-card block-kr">
           <div class="card-header">
-            <span class="card-icon bg-sky-100 text-sky-600">🏗️</span>
+            <i data-lucide="package" class="card-icon-lucide text-sky-600"></i>
             <h2>Key Resources</h2>
           </div>
           <div class="editable" contenteditable="true" id="block-kr"
@@ -156,7 +158,7 @@
 
         <section class="bmc-card block-vp">
           <div class="card-header">
-            <span class="card-icon bg-amber-100 text-amber-600">🎁</span>
+            <i data-lucide="gift" class="card-icon-lucide text-amber-600"></i>
             <h2>Value Propositions</h2>
           </div>
           <div class="editable" contenteditable="true" id="block-vp"
@@ -165,7 +167,7 @@
 
         <section class="bmc-card block-cr">
           <div class="card-header">
-            <span class="card-icon bg-rose-100 text-rose-600">❤️</span>
+            <i data-lucide="heart" class="card-icon-lucide text-rose-600"></i>
             <h2>Customer Relationships</h2>
           </div>
           <div class="editable" contenteditable="true" id="block-cr"
@@ -174,7 +176,7 @@
 
         <section class="bmc-card block-ch">
           <div class="card-header">
-            <span class="card-icon bg-teal-100 text-teal-600">🚚</span>
+            <i data-lucide="truck" class="card-icon-lucide text-teal-600"></i>
             <h2>Channels</h2>
           </div>
           <div class="editable" contenteditable="true" id="block-ch"
@@ -183,7 +185,7 @@
 
         <section class="bmc-card block-cs">
           <div class="card-header">
-            <span class="card-icon bg-emerald-100 text-emerald-600">👥</span>
+            <i data-lucide="user-circle" class="card-icon-lucide text-emerald-600"></i>
             <h2>Customer Segments</h2>
           </div>
           <div class="editable" contenteditable="true" id="block-cs"
@@ -192,7 +194,7 @@
 
         <section class="bmc-card block-cost">
           <div class="card-header">
-            <span class="card-icon bg-red-100 text-red-600">💰</span>
+            <i data-lucide="banknote" class="card-icon-lucide text-red-600"></i>
             <h2>Cost Structure</h2>
           </div>
           <div class="editable" contenteditable="true" id="block-cost"
@@ -201,7 +203,7 @@
 
         <section class="bmc-card block-rev">
           <div class="card-header">
-            <span class="card-icon bg-green-100 text-green-600">💵</span>
+            <i data-lucide="credit-card" class="card-icon-lucide text-green-600"></i>
             <h2>Revenue Streams</h2>
           </div>
           <div class="editable" contenteditable="true" id="block-rev"
@@ -248,11 +250,13 @@
   <!-- html2pdf.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
 
-  <!-- API Config (excluded from git) -->
-  <script src="./config.js"></script>
-
-  <!-- Application Logic -->
-  <script src="./app.js"></script>
+  <!-- Application Logic (Module) -->
+  <script type="module" src="./app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+  </script>
 </body>
 
 </html>
