@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnBack) btnBack.addEventListener('click', () => showScreen('landing-screen'));
   if (btnNew) btnNew.addEventListener('click', resetCanvas);
 
+  const btnTest = document.getElementById('btn-test-data');
+  if (btnTest) btnTest.addEventListener('click', fillWithTestData);
+
   if (btnGenerate) {
     btnGenerate.addEventListener('click', async () => {
       const fileInput = document.getElementById('pdf-input');
@@ -346,6 +349,26 @@ function resetCanvas() {
 }
 
 /* ═══════════════════════════════════════════════════
+   TEST DATA MODAL (SIMULATION)
+═══════════════════════════════════════════════════ */
+function fillWithTestData() {
+  const dummyData = {
+    key_partnerships: "• Fournisseurs locaux (matières premières)<br>• Influenceurs fitness<br>• Google Cloud Platform (hébergement)<br>• Stripe (paiements)",
+    key_activities: "• Développement de l'application<br>• Création de contenu marketing<br>• Support client 24/7<br>• Maintenance des serveurs",
+    key_resources: "• Équipe de développeurs<br>• Base de données utilisateurs<br>• Algorithme de recommandation<br>• Marque déposée",
+    value_propositions: "• Coaching personnalisé par IA<br>• suivi en temps réel des performances<br>• communauté active et motivante<br>• prix abordable par rapport au coaching physique",
+    customer_relationships: "• Assistance automatisée (chatbot)<br>• Newsletters personnalisées<br>• Programmes de fidélité<br>• Webinaires communautaires",
+    channels: "• App Store & Google Play<br>• Site web vitrine<br>• Publicités réseaux sociaux (Instagram, TikTok)<br>• Partenariats salles de sport",
+    customer_segments: "• Jeunes actifs urbains (25-35 ans)<br>• Débutants en fitness<br>• Personnes cherchant une alternative à la salle<br>• Passionnés de technologie",
+    cost_structure: "• Salaires (Dév, Marketing)<br>• Coûts serveurs & API<br>• Budget publicitaire<br>• Frais juridiques",
+    revenue_streams: "• Abonnement Freemium (9.99€/mois)<br>• Achats in-app (programmes spécifiques)<br>• Commissions sur produits partenaires<br>• Publicité ciblée (version gratuite)"
+  };
+
+  showScreen('canvas-screen');
+  fillCanvas(dummyData);
+}
+
+/* ═══════════════════════════════════════════════════
    DROPZONE
 ═══════════════════════════════════════════════════ */
 function setupDropzone() {
@@ -395,6 +418,9 @@ function exportPdf() {
   const spinner = btn.querySelector('.spinner');
 
   spinner.style.display = 'inline-block';
+
+  // Fix: Ensure icons are present before capture
+  if (window.lucide) window.lucide.createIcons();
 
   // Force scaling before export
   autoScaleAllBoxes();
