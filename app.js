@@ -157,7 +157,7 @@ function updateProgress(pct, msg, bar, label) {
 
 const SYSTEM_PROMPT = `Tu es un expert en stratégie d'entreprise.
 Remplis le Business Model Canvas (Osterwalder) à partir du texte fourni.
-IMPORTANT : Ne JAMAIS utiliser d'emojis, de puces (•) ou de symboles spéciaux. Formate tes réponses uniquement avec du texte brut et des retours à la ligne.
+IMPORTANT : Réponds exclusivement en JSON. N'utilise JAMAIS d'emojis, de puces ou de symboles spéciaux (◆, •). Utilise uniquement des retours à la ligne pour lister les points.
 Réponds UNIQUEMENT via un JSON valide (sans markdown, sans entête).
 Clés requises : key_partnerships, key_activities, key_resources, value_propositions, customer_relationships, channels, customer_segments, cost_structure, revenue_streams.`;
 
@@ -249,6 +249,9 @@ function fillCanvas(data) {
 
   // Refresh icons and UI if needed
   if (window.lucide) window.lucide.createIcons();
+
+  // Auto-scale with delay (User Request)
+  setTimeout(autoScaleAllBoxes, 100);
 }
 
 function formatList(txt) {
@@ -275,6 +278,10 @@ function setupAutoResize() {
     // Init
     autoResize(div);
   });
+}
+
+function autoScaleAllBoxes() {
+  document.querySelectorAll('.editable, .header-field').forEach(el => autoResize(el));
 }
 
 function autoResize(el) {
@@ -372,10 +379,13 @@ function exportPdf() {
 
   spinner.style.display = 'inline-block';
 
+  // Force scaling before export
+  autoScaleAllBoxes();
+
   const opt = {
     margin: 0,
-    filename: 'business-model-canvas.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
+    filename: 'mon-bmc.pdf',
+    image: { type: 'jpeg', quality: 1 },
     html2canvas: { scale: 2, useCORS: true },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
   };
