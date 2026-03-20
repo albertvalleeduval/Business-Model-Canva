@@ -4,9 +4,6 @@
 
 import { GEMINI_API_KEY } from './config.js';
 
-// Global state for keys
-let _keyIndex = 0;
-
 /* ═══════════════════════════════════════════════════
    DOM ELEMENTS & INITIALIZATION
 ═══════════════════════════════════════════════════ */
@@ -17,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnBack = document.getElementById('btn-back');
   const btnGenerate = document.getElementById('btn-generate');
   const btnNew = document.getElementById('btn-new-canvas');
-  const btnExport = document.getElementById('export-btn'); // Renamed ID in HTML usually, checking target
 
   if (btnManual) btnManual.addEventListener('click', () => showScreen('canvas-screen'));
   if (btnAi) btnAi.addEventListener('click', () => showScreen('ai-upload-screen'));
@@ -35,22 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // Export PDF
-  // Note: html2pdf is loaded via CDN in index.html for simplicity or we can import if installed.
-  // The prompt asked to add html2pdf.js to package.json, so we should try to use it if manageable.
-  // For now, assuming Global global html2pdf variable if script included, or import.
-  // Let's stick to global or CDN for libs to avoid complex bundler setup issues if user just runs vite.
-  // However, I will check if I can import it. html2pdf.js doesn't always play nice with imports.
-  // I'll keep the CDN logic for libraries in index.html for safety unless forced, 
-  // BUT the user put them in package.json. 
-  // I will assume they are globally available or I should import them?
-  // User said: "Dépendances : ... pdfjs-dist, html2pdf.js".
-  // I will try to use the global window objects for now to ensure compatibility with the existing HTML 
-  // unless I rewrite everything to imports. 
-  // To be safe and strict about "Refactorise... avec rigueur", I will use imports if possible,
-  // but `pdfjs-dist` worker setup in Vite is specific.
-  // I will use standard window globals for libs to ensure it works "immediately".
 
   const exportBtn = document.getElementById('export-btn');
   if (exportBtn) exportBtn.addEventListener('click', exportPdf);
@@ -172,8 +152,6 @@ function updateProgress(pct, msg, bar, label) {
 /* ═══════════════════════════════════════════════════
    GEMINI API (DIRECT)
 ═══════════════════════════════════════════════════ */
-// import { GEMINI_API_KEY } from './config.js'; // REMOVED DUPLICATE
-
 const SYSTEM_PROMPT = `Tu es un expert en stratégie d'entreprise.
 Remplis le Business Model Canvas (Osterwalder) à partir du texte fourni.
 IMPORTANT : Réponds exclusivement en JSON. N'utilise JAMAIS d'emojis, de puces ou de symboles spéciaux (◆, •). Utilise uniquement des retours à la ligne pour lister les points.
@@ -343,9 +321,12 @@ function loadFromStorage() {
 
 function resetCanvas() {
   if (!confirm("Effacer tout le canvas ?")) return;
-  document.querySelectorAll('.editable, .header-field').forEach(el => el.innerHTML = '');
+  document.querySelectorAll('.editable, .header-field').forEach(el => {
+    el.innerHTML = '';
+    autoResize(el);
+  });
   localStorage.removeItem('astry-bmc-data');
-  location.reload();
+  showScreen('landing-screen');
 }
 
 /* ═══════════════════════════════════════════════════
@@ -413,38 +394,65 @@ function setupDropzone() {
 }
 
 function exportPdf() {
-  const element = document.getElementById('bmc-root');
   const btn = document.getElementById('export-btn');
   const spinner = btn.querySelector('.spinner');
-
   spinner.style.display = 'inline-block';
 
   // Ensure icons are rendered
   if (window.lucide) window.lucide.createIcons();
 
-  // Force scaling
-  autoScaleAllBoxes();
+  // 1. Clone the BMC
+  const original = document.getElementById('bmc-root');
+  const clone = original.cloneNode(true);
 
-  // 1. Activate "Landscape Large" mode
-  document.body.classList.add('pdf-mode');
+  // 2. Force clone to exact A4 Landscape dimensions
+  Object.assign(clone.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '297mm',
+    height: '210mm',
+    padding: '10mm',
+    background: 'white',
+    zIndex: '99999',
+    overflow: 'hidden'
+  });
 
-  // 2. Config html2pdf
+  // Force the grid inside the clone
+  const grid = clone.querySelector('#canvas-grid');
+  if (grid) {
+    Object.assign(grid.style, {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(10, 1fr)',
+      gridTemplateRows: 'repeat(6, 1fr)',
+      gap: '0.5rem',
+      height: '100%'
+    });
+  }
+
+  // Hide toolbar inside the clone
+  const toolbar = clone.querySelector('.canvas-toolbar');
+  if (toolbar) toolbar.style.display = 'none';
+
+  // 3. Add clone to DOM (temporarily)
+  document.body.appendChild(clone);
+
+  // 4. Simple html2pdf config (clone is already at the right size)
   const opt = {
     margin: 0,
-    filename: 'Mon_BMC.pdf',
+    filename: 'Mon_Business_Model.pdf',
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
       scale: 2,
       useCORS: true,
-      scrollY: 0,
-      windowWidth: 1400 // Force Desktop render (3 columns)
+      scrollY: 0
     },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
   };
 
-  // 3. Generate and clean up
-  window.html2pdf().set(opt).from(element).save().then(() => {
-    document.body.classList.remove('pdf-mode');
+  // 5. Generate and clean up
+  window.html2pdf().set(opt).from(clone).save().then(() => {
+    document.body.removeChild(clone);
     spinner.style.display = 'none';
   });
 }

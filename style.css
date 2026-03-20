@@ -610,39 +610,5 @@ body {
   }
 }
 
-/* ── PDF EXPORT — Zoom Out Method (Final) ─────── */
-/* Activé UNIQUEMENT pendant l'export via JS */
-body.pdf-mode {
-  width: 297mm !important;
-  height: 210mm !important;
-  overflow: hidden !important;
-}
-
-body.pdf-mode #bmc-root {
-  width: 1400px !important;
-  /* L'ASTUCE : Dézoom pour faire rentrer 1400px dans 297mm */
-  transform: scale(0.75) !important;
-  transform-origin: top left !important;
-  margin: 0 !important;
-  padding: 20px !important;
-  box-shadow: none !important;
-  border: none !important;
-  background: white !important;
-  aspect-ratio: auto !important;
-  max-width: none !important;
-}
-
-body.pdf-mode #canvas-grid {
-  display: grid !important;
-  grid-template-columns: repeat(10, 1fr) !important;
-  grid-template-rows: repeat(6, 1fr) !important;
-  height: 600px !important;
-}
-
-/* Cache tout ce qui n'est pas le BMC */
-body.pdf-mode .canvas-toolbar,
-body.pdf-mode #landing-screen,
-body.pdf-mode #ai-upload-screen,
-body.pdf-mode .btn-back {
-  display: none !important;
-}
+/* ── PDF EXPORT — Clone Ghost Method ─────────── */
+/* No CSS needed: styles are applied inline on a cloned element during export */
