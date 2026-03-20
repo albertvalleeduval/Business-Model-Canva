@@ -2,7 +2,7 @@
    Business Model Canvas — Application Logic
    ═══════════════════════════════════════════════════ */
 
-import { GEMINI_API_KEY } from './config.js';
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 /* ═══════════════════════════════════════════════════
    DOM ELEMENTS & INITIALIZATION
