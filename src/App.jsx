@@ -66,16 +66,8 @@ function App() {
     }
   };
 
-  const handleExportPDF = async () => {
-    setIsExporting(true);
-    try {
-      await exportToPDF('bmc-canvas');
-      showNotification('PDF exported successfully!');
-    } catch (error) {
-      showNotification('Failed to export PDF: ' + error.message, 'error');
-    } finally {
-      setIsExporting(false);
-    }
+  const handleExportPDF = () => {
+    exportToPDF();
   };
 
   const handleBackToLanding = () => {
