@@ -1,11 +1,25 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
+// html2canvas doesn't support oklch() (Tailwind v4) — inline rgb() computed colors first
+function inlineColors(element) {
+    const els = [element, ...element.querySelectorAll('*')];
+    els.forEach(el => {
+        const cs = window.getComputedStyle(el);
+        el.style.color = cs.color;
+        el.style.backgroundColor = cs.backgroundColor;
+        el.style.borderColor = cs.borderColor;
+        el.style.borderTopColor = cs.borderTopColor;
+        el.style.borderRightColor = cs.borderRightColor;
+        el.style.borderBottomColor = cs.borderBottomColor;
+        el.style.borderLeftColor = cs.borderLeftColor;
+    });
+}
+
 export async function exportToPDF(elementId = 'bmc-canvas') {
     const element = document.getElementById(elementId);
     if (!element) throw new Error('Canvas element not found');
 
-    // Clone the element so we never touch the real DOM
     const clone = element.cloneNode(true);
     clone.style.position = 'fixed';
     clone.style.top = '-9999px';
@@ -14,13 +28,10 @@ export async function exportToPDF(elementId = 'bmc-canvas') {
     clone.style.zIndex = '-1';
     document.body.appendChild(clone);
 
-    // Replace textareas in clone with divs containing their text
+    // Replace textareas with divs (html2canvas can't read textarea content)
     const originalTextareas = element.querySelectorAll('textarea');
-    const cloneTextareas = clone.querySelectorAll('textarea');
-
-    cloneTextareas.forEach((ta, i) => {
-        const original = originalTextareas[i];
-        const cs = window.getComputedStyle(original);
+    clone.querySelectorAll('textarea').forEach((ta, i) => {
+        const cs = window.getComputedStyle(originalTextareas[i]);
         const div = document.createElement('div');
         div.style.fontSize = cs.fontSize;
         div.style.fontFamily = cs.fontFamily;
@@ -31,9 +42,12 @@ export async function exportToPDF(elementId = 'bmc-canvas') {
         div.style.flex = '1';
         div.style.overflow = 'hidden';
         div.className = ta.className;
-        div.textContent = original.value;
+        div.textContent = originalTextareas[i].value;
         ta.replaceWith(div);
     });
+
+    // Inline all computed colors to avoid oklch() parsing errors
+    inlineColors(clone);
 
     try {
         const canvas = await html2canvas(clone, {
