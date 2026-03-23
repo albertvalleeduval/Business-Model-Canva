@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 export default function EditableBlock({
     title,
@@ -11,18 +11,13 @@ export default function EditableBlock({
     const textareaRef = useRef(null);
     const [fontSize, setFontSize] = useState(maxFontSize);
 
-    useEffect(() => {
-        adjustFontSize();
-    }, [value]);
-
-    const adjustFontSize = () => {
+    const adjustFontSize = useCallback(() => {
         const textarea = textareaRef.current;
-        if (!textarea) return;
+        if (!textarea || textarea.clientHeight === 0) return;
 
         let currentSize = maxFontSize;
         textarea.style.fontSize = `${currentSize}px`;
 
-        // Check if content overflows
         while (
             (textarea.scrollHeight > textarea.clientHeight ||
                 textarea.scrollWidth > textarea.clientWidth) &&
@@ -33,7 +28,25 @@ export default function EditableBlock({
         }
 
         setFontSize(currentSize);
-    };
+    }, [value, minFontSize, maxFontSize]);
+
+    // Run synchronously after DOM update to catch initial render
+    useLayoutEffect(() => {
+        adjustFontSize();
+    }, [adjustFontSize]);
+
+    // ResizeObserver: recalcule quand le conteneur obtient ses vraies dimensions
+    useEffect(() => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+
+        const observer = new ResizeObserver(() => {
+            adjustFontSize();
+        });
+        observer.observe(textarea);
+
+        return () => observer.disconnect();
+    }, [adjustFontSize]);
 
     return (
         <div className={`relative border border-slate-200 bg-white p-4 flex flex-col ${className}`}>
