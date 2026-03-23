@@ -66,8 +66,15 @@ function App() {
     }
   };
 
-  const handleExportPDF = () => {
-    exportToPDF();
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      await exportToPDF('bmc-canvas');
+    } catch (error) {
+      showNotification('Failed to export PDF: ' + error.message, 'error');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleBackToLanding = () => {
