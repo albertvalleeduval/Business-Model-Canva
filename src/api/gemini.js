@@ -1,19 +1,24 @@
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
-const BMC_SYSTEM_PROMPT = `Analyze the provided document or text about a business idea. Extract relevant data to fill a Business Model Canvas.
+const SYSTEM_INSTRUCTION = `You are a business strategy expert specializing in Business Model Canvas creation.
+Your task is to generate a complete, detailed Business Model Canvas based on any business description provided.
+Even if the description is brief or incomplete, you MUST infer, deduce and create realistic, professional content for all 9 sections.
+Never say information is missing or unavailable — always generate relevant, plausible content based on the business context.
 
-Return ONLY a valid JSON object with these exact keys:
-- key_partners
-- key_activities
-- key_resources
-- value_propositions
-- customer_relationships
-- channels
-- customer_segments
-- cost_structure
-- revenue_streams
+Return ONLY a valid JSON object (no markdown, no explanation) with exactly these keys:
+{
+  "key_partners": "...",
+  "key_activities": "...",
+  "key_resources": "...",
+  "value_propositions": "...",
+  "customer_relationships": "...",
+  "channels": "...",
+  "customer_segments": "...",
+  "cost_structure": "...",
+  "revenue_streams": "..."
+}
 
-Each value should be a concise, professional bullet-point list (use \\n for line breaks). Be specific and actionable. Focus on the most critical elements.`;
+Each value must be a bullet-point list using • as bullet character and \\n between points. Be specific, actionable and professional.`;
 
 export async function generateBMCFromText(text) {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -26,9 +31,12 @@ export async function generateBMCFromText(text) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+            system_instruction: {
+                parts: [{ text: SYSTEM_INSTRUCTION }]
+            },
             contents: [{
                 parts: [{
-                    text: `${BMC_SYSTEM_PROMPT}\n\nBusiness Description:\n${text}`
+                    text: `Generate a complete Business Model Canvas for the following business:\n\n${text}`
                 }]
             }],
             generationConfig: {
