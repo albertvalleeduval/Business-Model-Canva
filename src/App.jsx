@@ -20,17 +20,9 @@ const initialData = {
 
 function App() {
   const [view, setView] = useState('landing'); // 'landing' or 'canvas'
-  const [canvasData, setCanvasData] = useState(initialData);
+  const [canvasData, setCanvasData] = useState(() => loadFromLocalStorage() || initialData);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [notification, setNotification] = useState(null);
-
-  // Load saved data on mount
-  useEffect(() => {
-    const savedData = loadFromLocalStorage();
-    if (savedData) {
-      setCanvasData(savedData);
-    }
-  }, []);
 
   // Auto-save on data change
   useEffect(() => {
