@@ -22,6 +22,9 @@ export default async function handler(req, res) {
         const bmc = await callGemini(text.slice(0, MAX_INPUT_CHARS), apiKey);
         return res.status(200).json(bmc);
     } catch (error) {
-        return res.status(502).json({ error: error.message });
+        // Log the real Google API error server-side; never leak it to the
+        // client, which only needs a generic, actionable message.
+        console.error('Gemini generation failed:', error);
+        return res.status(502).json({ error: 'AI generation failed. Please try again.' });
     }
 }
