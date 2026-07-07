@@ -1,0 +1,20 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="7" fill="#0F172A"/>
+  <g fill="#F8FAFC" opacity="0.82">
+    <!-- Key Partners (full-height left col) -->
+    <rect x="5"    y="5"  width="3.6" height="13" rx="0.8"/>
+    <!-- Key Activities / Key Resources (stacked) -->
+    <rect x="9.6"  y="5"  width="3.6" height="6"  rx="0.8"/>
+    <rect x="9.6"  y="12" width="3.6" height="6"  rx="0.8"/>
+    <!-- Customer Relationships / Channels (stacked) -->
+    <rect x="18.8" y="5"  width="3.6" height="6"  rx="0.8"/>
+    <rect x="18.8" y="12" width="3.6" height="6"  rx="0.8"/>
+    <!-- Customer Segments (full-height right col) -->
+    <rect x="23.4" y="5"  width="3.6" height="13" rx="0.8"/>
+    <!-- Cost Structure / Revenue Streams (bottom bar) -->
+    <rect x="5"    y="19" width="10.5" height="8" rx="0.8"/>
+    <rect x="16.5" y="19" width="10.5" height="8" rx="0.8"/>
+  </g>
+  <!-- Value Proposition (center, highlighted) -->
+  <rect x="14.2" y="5" width="3.6" height="13" rx="0.8" fill="#F8FAFC"/>
+</svg>
