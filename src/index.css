@@ -16,13 +16,55 @@
     size: A4 landscape;
     margin: 0;
   }
-  
+
+  html,
   body {
+    height: auto;
+    overflow: hidden;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
-  
+
   .no-print {
     display: none !important;
+  }
+
+  /* Only the canvas is printed: hide everything, reveal the canvas subtree */
+  body {
+    visibility: hidden;
+  }
+
+  #bmc-canvas,
+  #bmc-canvas * {
+    visibility: visible;
+  }
+
+  /* The canvas becomes the A4 landscape page */
+  #bmc-canvas {
+    position: fixed;
+    inset: 0;
+    width: 297mm;
+    height: 210mm;
+    max-width: none;
+    margin: 0;
+    padding: 8mm;
+    display: flex;
+    flex-direction: column;
+    background: white;
+  }
+
+  #bmc-canvas .bmc-grid {
+    flex: 1;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+  }
+
+  /* Swap live textareas for their static print mirrors */
+  .bmc-screen-input {
+    display: none !important;
+  }
+
+  .bmc-print-text {
+    display: block !important;
   }
 }

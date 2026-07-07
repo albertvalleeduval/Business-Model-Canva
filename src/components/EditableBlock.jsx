@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
 export default function EditableBlock({
     title,
@@ -9,7 +9,7 @@ export default function EditableBlock({
     maxFontSize = 16
 }) {
     const textareaRef = useRef(null);
-    const [fontSize, setFontSize] = useState(maxFontSize);
+    const printRef = useRef(null);
 
     const adjustFontSize = useCallback(() => {
         const textarea = textareaRef.current;
@@ -27,13 +27,16 @@ export default function EditableBlock({
             textarea.style.fontSize = `${currentSize}px`;
         }
 
-        setFontSize(currentSize);
-    }, [value, minFontSize, maxFontSize]);
+        // Keep the print mirror at the same size as the live textarea
+        if (printRef.current) {
+            printRef.current.style.fontSize = `${currentSize}px`;
+        }
+    }, [minFontSize, maxFontSize]);
 
     // Run synchronously after DOM update to catch initial render
     useLayoutEffect(() => {
         adjustFontSize();
-    }, [adjustFontSize]);
+    }, [adjustFontSize, value]);
 
     // ResizeObserver: recalcule quand le conteneur obtient ses vraies dimensions
     useEffect(() => {
@@ -57,13 +60,17 @@ export default function EditableBlock({
                 ref={textareaRef}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="flex-1 resize-none outline-none text-slate-800 leading-relaxed overflow-hidden w-full"
-                style={{
-                    fontSize: `${fontSize}px`,
-                    minHeight: '100%'
-                }}
+                className="bmc-screen-input flex-1 resize-none outline-none text-slate-800 leading-relaxed overflow-hidden w-full"
+                style={{ minHeight: '100%' }}
                 placeholder="Enter text here..."
             />
+            {/* Static mirror shown only when printing (textareas don't print reliably) */}
+            <div
+                ref={printRef}
+                className="bmc-print-text hidden flex-1 text-slate-800 leading-relaxed overflow-hidden whitespace-pre-wrap"
+            >
+                {value}
+            </div>
         </div>
     );
 }

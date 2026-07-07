@@ -6,14 +6,16 @@ export default function BMCCanvas({ data, onDataChange }) {
     };
 
     return (
-        <div id="bmc-canvas" className="w-full max-w-[1400px] mx-auto bg-white p-8">
+        // max-w matches the printed A4 width so on-screen font auto-scaling
+        // computes the same sizes the print layout will use (WYSIWYG)
+        <div id="bmc-canvas" className="w-full max-w-[297mm] mx-auto bg-white p-8">
             {/* Business Model Canvas Title */}
             <h1 className="text-3xl font-bold text-center mb-6 text-slate-800">
                 Business Model Canvas
             </h1>
 
             {/* Main Grid */}
-            <div className="grid grid-cols-5 grid-rows-2 gap-0 border border-slate-300 bg-white"
+            <div className="bmc-grid grid grid-cols-5 grid-rows-2 gap-0 border border-slate-300 bg-white"
                 style={{ aspectRatio: '297/210', minHeight: '600px' }}>
 
                 {/* Row 1 - Top Section */}
