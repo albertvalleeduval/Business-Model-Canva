@@ -2,9 +2,14 @@
 // and, in local dev only, imported directly by the client (src/api/gemini.js).
 // Files starting with "_" are not exposed as routes by Vercel.
 
-// gemini-2.0-flash was retired from the free tier (its quota dropped to 0);
-// gemini-3.5-flash is the current free-tier Flash model (15 RPM / 1500 RPD)
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent';
+// Free-tier models, tried in order: the free tier gets throttled first when
+// a model is under load ("high demand" errors), so we fall back to the less
+// congested flash-lite — plenty capable for structured extraction like this.
+// (gemini-2.0-flash was retired from the free tier: quota dropped to 0.)
+const GEMINI_MODELS = ['gemini-3.5-flash', 'gemini-3.1-flash-lite'];
+
+const apiUrl = (model) =>
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
 export const MAX_INPUT_CHARS = 12000;
 
@@ -40,8 +45,28 @@ Return ONLY a valid JSON object (no markdown, no explanation) with exactly these
 
 Each value must be a bullet-point list using • as bullet character and \\n between points. Be specific, actionable and professional.`;
 
+// Overload/quota errors worth retrying on another model, as opposed to
+// permanent ones (bad key, malformed request)
+function isRetryable(status, message) {
+    if (status === 429 || status === 503) return true;
+    return /high demand|overloaded|quota|resource.{0,10}exhausted/i.test(message);
+}
+
 export async function callGemini(text, apiKey) {
-    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+    let lastError;
+    for (const model of GEMINI_MODELS) {
+        try {
+            return await callModel(model, text, apiKey);
+        } catch (error) {
+            lastError = error;
+            if (!error.retryable) throw error;
+        }
+    }
+    throw lastError;
+}
+
+async function callModel(model, text, apiKey) {
+    const response = await fetch(`${apiUrl(model)}?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -68,7 +93,9 @@ export async function callGemini(text, apiKey) {
         } catch {
             // non-JSON error body, keep generic message
         }
-        throw new Error(message);
+        const error = new Error(message);
+        error.retryable = isRetryable(response.status, message);
+        throw error;
     }
 
     const data = await response.json();
