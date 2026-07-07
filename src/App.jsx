@@ -56,11 +56,16 @@ function App() {
     }
   };
 
-  // Native print-to-PDF: the print stylesheet lays the canvas out on an
-  // A4 landscape page, so the browser's "Save as PDF" gives a vector-sharp
-  // export with no rasterization quirks.
-  const handleExportPDF = () => {
-    window.print();
+  // Direct download: the PDF is drawn programmatically (vector, exact A4
+  // landscape), no print dialog. jsPDF is loaded on demand to keep the
+  // initial bundle small.
+  const handleExportPDF = async () => {
+    try {
+      const { exportToPDF } = await import('./utils/pdfExport');
+      exportToPDF(canvasData);
+    } catch (error) {
+      showNotification('Failed to export PDF: ' + error.message, 'error');
+    }
   };
 
   const handleBackToLanding = () => {
@@ -129,7 +134,7 @@ function App() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Download PDF
+                Export PDF
               </button>
             </div>
           </div>
