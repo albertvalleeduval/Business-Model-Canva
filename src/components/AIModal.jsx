@@ -1,22 +1,54 @@
 import { useState, useRef } from 'react';
 import { parseFile } from '../utils/fileParser';
 
+const ACCEPTED_EXTENSIONS = ['pdf', 'docx', 'txt'];
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export default function AIModal({ isOpen, onClose, onGenerate }) {
     const [inputMethod, setInputMethod] = useState('file'); // 'file' or 'text'
     const [textInput, setTextInput] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState('');
     const fileInputRef = useRef(null);
 
     if (!isOpen) return null;
 
-    const handleFileSelect = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setSelectedFile(file);
-            setError('');
+    const acceptFile = (file) => {
+        if (!file) return;
+        const extension = file.name.split('.').pop().toLowerCase();
+        if (!ACCEPTED_EXTENSIONS.includes(extension)) {
+            setError('Unsupported file type. Please upload PDF, DOCX, or TXT files.');
+            return;
         }
+        setSelectedFile(file);
+        setError('');
+    };
+
+    const handleFileSelect = (e) => {
+        acceptFile(e.target.files[0]);
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+        acceptFile(e.dataTransfer.files?.[0]);
     };
 
     const handleGenerate = async () => {
@@ -97,24 +129,57 @@ export default function AIModal({ isOpen, onClose, onGenerate }) {
                             <label className="block text-sm font-medium text-slate-700">
                                 Upload your business document (.pdf, .txt, .docx)
                             </label>
-                            <div className="flex items-center gap-3">
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    accept=".pdf,.txt,.docx"
-                                    onChange={handleFileSelect}
-                                    className="hidden"
-                                />
-                                <button
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
-                                >
-                                    Choose File
-                                </button>
-                                {selectedFile && (
-                                    <span className="text-sm text-slate-600">
-                                        {selectedFile.name}
-                                    </span>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".pdf,.txt,.docx"
+                                onChange={handleFileSelect}
+                                className="hidden"
+                            />
+                            <div
+                                onClick={() => fileInputRef.current?.click()}
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
+                                className={`flex flex-col items-center justify-center gap-3 p-10 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${isDragging
+                                        ? 'border-slate-900 bg-slate-100'
+                                        : 'border-slate-300 bg-slate-50 hover:border-slate-400 hover:bg-slate-100'
+                                    }`}
+                            >
+                                {selectedFile ? (
+                                    <>
+                                        <svg className="w-10 h-10 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <div className="text-center">
+                                            <p className="font-medium text-slate-900">{selectedFile.name}</p>
+                                            <p className="text-sm text-slate-500">{formatFileSize(selectedFile.size)}</p>
+                                        </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedFile(null);
+                                                if (fileInputRef.current) fileInputRef.current.value = '';
+                                            }}
+                                            className="text-sm text-slate-500 underline hover:text-slate-700"
+                                        >
+                                            Remove file
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                        </svg>
+                                        <div className="text-center">
+                                            <p className="font-medium text-slate-700">
+                                                Drag &amp; drop your document here
+                                            </p>
+                                            <p className="text-sm text-slate-500">
+                                                or click to browse — PDF, DOCX or TXT
+                                            </p>
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         </div>
