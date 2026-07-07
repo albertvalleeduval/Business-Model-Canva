@@ -6,17 +6,18 @@ export default function BMCCanvas({ data, onDataChange }) {
     };
 
     return (
-        // max-w matches the printed A4 width so on-screen font auto-scaling
-        // computes the same sizes the print layout will use (WYSIWYG)
-        <div id="bmc-canvas" className="w-full max-w-[297mm] mx-auto bg-white p-8">
+        // The whole canvas (title included) keeps the A4 landscape geometry the
+        // print layout uses, so on-screen font auto-scaling is WYSIWYG with
+        // the exported PDF — same width, same block heights.
+        <div id="bmc-canvas" className="w-full max-w-[297mm] mx-auto bg-white flex flex-col"
+            style={{ aspectRatio: '297/210', padding: '8mm' }}>
             {/* Business Model Canvas Title */}
             <h1 className="text-3xl font-bold text-center mb-6 text-slate-800">
                 Business Model Canvas
             </h1>
 
             {/* Main Grid */}
-            <div className="bmc-grid grid grid-cols-5 grid-rows-2 gap-0 border border-slate-300 bg-white"
-                style={{ aspectRatio: '297/210', minHeight: '600px' }}>
+            <div className="bmc-grid grid grid-cols-5 grid-rows-2 gap-0 border border-slate-300 bg-white flex-1 min-h-0">
 
                 {/* Row 1 - Top Section */}
                 {/* Column 1: Key Partners (Tall) */}

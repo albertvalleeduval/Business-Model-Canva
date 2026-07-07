@@ -56,18 +56,20 @@ export default function EditableBlock({
             <h3 className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 flex-shrink-0">
                 {title}
             </h3>
+            {/* No min-height here: flex-1 alone must size the textarea, so it
+                occupies exactly the same box as the print mirror below —
+                otherwise the auto-scaler measures more room than print has */}
             <textarea
                 ref={textareaRef}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="bmc-screen-input flex-1 resize-none outline-none text-slate-800 leading-relaxed overflow-hidden w-full"
-                style={{ minHeight: '100%' }}
+                className="bmc-screen-input flex-1 resize-none outline-none text-slate-800 leading-relaxed overflow-hidden w-full min-h-0"
                 placeholder="Enter text here..."
             />
             {/* Static mirror shown only when printing (textareas don't print reliably) */}
             <div
                 ref={printRef}
-                className="bmc-print-text hidden flex-1 text-slate-800 leading-relaxed overflow-hidden whitespace-pre-wrap"
+                className="bmc-print-text hidden flex-1 min-h-0 text-slate-800 leading-relaxed overflow-hidden whitespace-pre-wrap"
             >
                 {value}
             </div>
