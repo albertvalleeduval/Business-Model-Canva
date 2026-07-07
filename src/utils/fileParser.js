@@ -1,52 +1,57 @@
 import mammoth from 'mammoth';
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+
+// Keep prompts small enough for the AI call
+const MAX_PAGES = 15;
+const MAX_CHARS = 10000;
 
 // Extract text from PDF
 export async function extractPDFText(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            try {
-                // For PDF, we'll use a simple text extraction
-                // Note: pdf-parse doesn't work in browser, so we'll use a simpler approach
-                const text = await file.text();
-                resolve(text);
-            } catch (error) {
-                reject(new Error('Failed to parse PDF file'));
-            }
-        };
-        reader.onerror = () => reject(new Error('Failed to read file'));
-        reader.readAsText(file);
-    });
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+        const pageCount = Math.min(pdf.numPages, MAX_PAGES);
+        const pages = [];
+        for (let i = 1; i <= pageCount; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            pages.push(content.items.map((item) => item.str).join(' '));
+        }
+
+        const text = pages.join('\n').replace(/\s+/g, ' ').trim();
+        if (!text) {
+            throw new Error('No readable text found in this PDF (it may be a scanned document).');
+        }
+        return text.slice(0, MAX_CHARS);
+    } catch (error) {
+        if (error.message.includes('No readable text')) throw error;
+        throw new Error('Failed to parse PDF file');
+    }
 }
 
 // Extract text from DOCX
 export async function extractDOCXText(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            try {
-                const arrayBuffer = e.target.result;
-                const result = await mammoth.extractRawText({ arrayBuffer });
-                resolve(result.value);
-            } catch (error) {
-                reject(new Error('Failed to parse DOCX file'));
-            }
-        };
-        reader.onerror = () => reject(new Error('Failed to read file'));
-        reader.readAsArrayBuffer(file);
-    });
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        return result.value.slice(0, MAX_CHARS);
+    } catch {
+        throw new Error('Failed to parse DOCX file');
+    }
 }
 
 // Extract text from TXT
 export async function extractTXTText(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            resolve(e.target.result);
-        };
-        reader.onerror = () => reject(new Error('Failed to read file'));
-        reader.readAsText(file);
-    });
+    try {
+        const text = await file.text();
+        return text.slice(0, MAX_CHARS);
+    } catch {
+        throw new Error('Failed to read file');
+    }
 }
 
 // Main file parser
