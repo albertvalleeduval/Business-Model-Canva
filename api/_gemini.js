@@ -2,7 +2,9 @@
 // and, in local dev only, imported directly by the client (src/api/gemini.js).
 // Files starting with "_" are not exposed as routes by Vercel.
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+// gemini-2.0-flash was retired from the free tier (its quota dropped to 0);
+// gemini-3.5-flash is the current free-tier Flash model (15 RPM / 1500 RPD)
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent';
 
 export const MAX_INPUT_CHARS = 12000;
 
