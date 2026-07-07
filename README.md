@@ -60,7 +60,7 @@ To test the serverless function locally, use `vercel dev` instead of `npm run de
 - **Tailwind CSS v4** — styling
 - **pdf.js** — text extraction from uploaded PDFs
 - **mammoth** — DOCX parsing
-- **Google Gemini** (`gemini-2.0-flash`) — canvas generation, proxied through a Vercel serverless function
+- **Google Gemini** (`gemini-3.5-flash`, free tier) — canvas generation, proxied through a Vercel serverless function
 
 ## License
 
