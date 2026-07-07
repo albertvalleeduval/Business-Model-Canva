@@ -210,7 +210,12 @@ export default function AIModal({ isOpen, onClose, onGenerate }) {
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-slate-200 flex gap-3 justify-end">
+                <div className="p-6 border-t border-slate-200 space-y-4">
+                    <p className="text-xs text-slate-400">
+                        Your description is processed by Google Gemini to generate the canvas —
+                        avoid uploading confidential documents.
+                    </p>
+                    <div className="flex gap-3 justify-end">
                     <button
                         onClick={onClose}
                         disabled={isProcessing}
@@ -235,6 +240,7 @@ export default function AIModal({ isOpen, onClose, onGenerate }) {
                             'Generate Canvas'
                         )}
                     </button>
+                    </div>
                 </div>
             </div>
         </div>

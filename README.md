@@ -62,6 +62,12 @@ To test the serverless function locally, use `vercel dev` instead of `npm run de
 - **mammoth** — DOCX parsing
 - **Google Gemini** (`gemini-3.5-flash`, free tier) — canvas generation, proxied through a Vercel serverless function
 
+## Privacy
+
+- No accounts, no sign-up, no tracking.
+- Your canvas data stays in your browser — it is saved to `localStorage` and never sent to a server.
+- The only data that leaves your browser is the business description you submit for **AI generation**: it is sent to Google Gemini (free tier) to produce the canvas. Avoid uploading confidential documents.
+
 ## License
 
 MIT
