@@ -65,6 +65,24 @@ export async function callGemini(text, apiKey) {
     throw lastError;
 }
 
+function generationConfig(model) {
+    const config = {
+        temperature: 0.7,
+        // Gemini 3.x "thinking" tokens count against maxOutputTokens: with a
+        // small budget the reasoning eats it all and the JSON arrives
+        // truncated ("Failed to parse AI response")
+        maxOutputTokens: 8192,
+        // Ask for pure JSON output instead of prose-with-fences
+        responseMimeType: 'application/json',
+    };
+    // Minimal reasoning is plenty for structured extraction, and keeps the
+    // token budget for the actual answer (thinkingLevel is 3.5+ only)
+    if (model === 'gemini-3.5-flash') {
+        config.thinkingConfig = { thinkingLevel: 'low' };
+    }
+    return config;
+}
+
 async function callModel(model, text, apiKey) {
     const response = await fetch(`${apiUrl(model)}?key=${apiKey}`, {
         method: 'POST',
@@ -78,10 +96,7 @@ async function callModel(model, text, apiKey) {
                     text: `Generate a complete Business Model Canvas for the following business:\n\n${text}`
                 }]
             }],
-            generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 2048,
-            }
+            generationConfig: generationConfig(model)
         })
     });
 
@@ -99,25 +114,40 @@ async function callModel(model, text, apiKey) {
     }
 
     const data = await response.json();
-    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const candidate = data.candidates?.[0];
+    const generatedText = candidate?.content?.parts
+        ?.map((part) => part.text || '')
+        .join('') || '';
+
+    // A malformed/truncated/blocked answer from one model is worth retrying
+    // on the fallback model, so mark these errors retryable
+    const parseError = (message) => {
+        const error = new Error(message);
+        error.retryable = true;
+        return error;
+    };
+
+    if (candidate?.finishReason === 'MAX_TOKENS') {
+        throw parseError('AI response was truncated');
+    }
 
     const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-        throw new Error('Failed to parse AI response');
+        throw parseError('Failed to parse AI response');
     }
 
     let parsed;
     try {
         parsed = JSON.parse(jsonMatch[0]);
     } catch {
-        throw new Error('Failed to parse AI response');
+        throw parseError('Failed to parse AI response');
     }
 
     const missing = REQUIRED_KEYS.filter(
         (key) => typeof parsed[key] !== 'string' || !parsed[key].trim()
     );
     if (missing.length > 0) {
-        throw new Error(`AI response is missing sections: ${missing.join(', ')}`);
+        throw parseError(`AI response is missing sections: ${missing.join(', ')}`);
     }
 
     // Return only the 9 expected keys, nothing else
