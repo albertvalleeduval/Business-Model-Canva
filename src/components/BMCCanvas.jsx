@@ -17,7 +17,8 @@ export default function BMCCanvas({ data, onDataChange }) {
             </h1>
 
             {/* Main Grid */}
-            <div className="bmc-grid grid grid-cols-5 grid-rows-2 gap-0 border border-slate-300 bg-white flex-1 min-h-0">
+            {/* 65/35 row split, mirroring exportLayout.TOP_RATIO */}
+            <div className="bmc-grid grid grid-cols-5 grid-rows-[65fr_35fr] gap-0 border border-slate-300 bg-white flex-1 min-h-0">
 
                 {/* Row 1 - Top Section */}
                 {/* Column 1: Key Partners (Tall) */}
